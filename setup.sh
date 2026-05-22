@@ -26,6 +26,19 @@ command -v docker >/dev/null 2>&1 || error "Docker is niet geïnstalleerd. Insta
 docker compose version >/dev/null 2>&1 || error "Docker Compose (v2) is niet beschikbaar. Voer 'sudo apt install docker-compose-plugin' uit."
 command -v git >/dev/null 2>&1 || error "Git is niet geïnstalleerd. Voer 'sudo apt install git' uit."
 
+# Docker socket bereikbaarheidscheck (veelvoorkomend probleem op Ubuntu)
+if ! docker info >/dev/null 2>&1; then
+  echo ""
+  echo -e "${RED}[memories-hub]${NC} Geen toegang tot de Docker socket."
+  echo ""
+  echo "  Voer dit uit en start het script daarna opnieuw:"
+  echo ""
+  echo -e "  ${CYAN}sudo usermod -aG docker \$USER${NC}"
+  echo -e "  ${CYAN}newgrp docker${NC}"
+  echo ""
+  exit 1
+fi
+
 success "Alle vereisten aanwezig."
 
 # ── Repository klonen ──────────────────────────────────────────────────────────
