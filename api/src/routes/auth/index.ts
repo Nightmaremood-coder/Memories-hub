@@ -23,18 +23,27 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     const passwordHash = await bcrypt.hash(body.password, BCRYPT_ROUNDS);
 
+    // First registered user automatically becomes admin (no manual seed needed)
+    const countResult = await db.query(`SELECT COUNT(*)::int AS total FROM users`);
+    const isFirstUser = countResult.rows[0].total === 0;
+    const role = isFirstUser ? 'admin' : 'user';
+    const status = isFirstUser ? 'active' : 'pending';
+
     try {
       const result = await db.query(
-        `INSERT INTO users (username, email, password_hash, display_name)
-         VALUES ($1, $2, $3, $4)
-         RETURNING id, username, email, status`,
-        [body.username, body.email, passwordHash, body.display_name ?? null]
+        `INSERT INTO users (username, email, password_hash, display_name, role, status)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id, username, email, role, status`,
+        [body.username, body.email, passwordHash, body.display_name ?? null, role, status]
       );
       return reply.code(201).send({
         id: result.rows[0].id,
         username: result.rows[0].username,
+        role: result.rows[0].role,
         status: result.rows[0].status,
-        message: 'Account created. Awaiting admin approval before you can log in.',
+        message: isFirstUser
+          ? 'Admin account created. You can log in immediately.'
+          : 'Account created. Awaiting admin approval before you can log in.',
       });
     } catch (err: any) {
       if (err.code === '23505') {

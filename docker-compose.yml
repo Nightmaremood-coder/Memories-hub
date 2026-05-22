@@ -10,12 +10,16 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  # media_storage is managed by Docker automatically — no manual mkdir needed.
+  # To store media on an external drive or NAS, uncomment and edit the block below:
+  #
+  # media_storage:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: /mnt/nas/memories-hub   # ← pad naar jouw externe schijf
   media_storage:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${MEDIA_STORAGE_PATH:-./storage}
 
 services:
 
