@@ -85,14 +85,15 @@ info "Memories-Hub starten..."
 docker compose up -d
 
 # ── Wachten tot de API bereikbaar is ──────────────────────────────────────────
-info "Wachten tot de API gereed is..."
-MAX_WAIT=90
+info "Wachten tot de API gereed is (max 2 minuten)..."
+MAX_WAIT=120
 ELAPSED=0
-until curl -sf http://localhost:8080/health >/dev/null 2>&1; do
-  sleep 3
-  ELAPSED=$((ELAPSED + 3))
+until docker compose exec -T api wget -qO- http://localhost:3000/health >/dev/null 2>&1; do
+  sleep 4
+  ELAPSED=$((ELAPSED + 4))
   if [ $ELAPSED -ge $MAX_WAIT ]; then
-    warn "API is na ${MAX_WAIT}s nog niet bereikbaar. Controleer: docker compose logs api"
+    warn "API start langzaam op. Controleer de logs met: docker compose logs api"
+    warn "Dit is normaal bij de eerste keer — de database wordt nog opgezet."
     break
   fi
 done
