@@ -131,7 +131,7 @@ const mediaRoutes: FastifyPluginAsync = async (fastify) => {
   );
 
   // GET /media/:id
-  fastify.get<{ Params: { id: string } }>('/:id', { preHandler }, async (request, reply) => {
+  fastify.get<{ Params: { id: string } }>('/media/:id', { preHandler }, async (request, reply) => {
     const { id: userId, role } = (request as any).user;
     const result = await db.query(`SELECT * FROM media WHERE id = $1`, [request.params.id]);
     const media = result.rows[0];
@@ -213,7 +213,7 @@ const mediaRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // DELETE /media/:id
-  fastify.delete<{ Params: { id: string } }>('/:id', { preHandler }, async (request, reply) => {
+  fastify.delete<{ Params: { id: string } }>('/media/:id', { preHandler }, async (request, reply) => {
     const { id: userId, role } = (request as any).user;
     const result = await db.query(`SELECT * FROM media WHERE id = $1`, [request.params.id]);
     const media = result.rows[0];

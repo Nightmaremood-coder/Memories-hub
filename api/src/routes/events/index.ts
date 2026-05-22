@@ -85,7 +85,7 @@ const eventsRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // GET /events/:id
-  fastify.get<{ Params: { id: string } }>('/:id', { preHandler }, async (request, reply) => {
+  fastify.get<{ Params: { id: string } }>('/events/:id', { preHandler }, async (request, reply) => {
     const { id: userId, role } = (request as any).user;
     if (role !== 'admin' && !(await canViewEvent(userId, request.params.id))) {
       return reply.code(403).send({ statusCode: 403, error: 'Forbidden', message: 'Access denied to this event.' });
@@ -103,7 +103,7 @@ const eventsRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // PATCH /events/:id
-  fastify.patch<{ Params: { id: string } }>('/:id', { preHandler }, async (request, reply) => {
+  fastify.patch<{ Params: { id: string } }>('/events/:id', { preHandler }, async (request, reply) => {
     const { id: userId, role } = (request as any).user;
     const body = z.object({
       title: z.string().min(1).max(255).optional(),
@@ -135,7 +135,7 @@ const eventsRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // DELETE /events/:id
-  fastify.delete<{ Params: { id: string } }>('/:id', { preHandler }, async (request, reply) => {
+  fastify.delete<{ Params: { id: string } }>('/events/:id', { preHandler }, async (request, reply) => {
     const { id: userId, role } = (request as any).user;
     const existing = await db.query(`SELECT creator_id FROM events WHERE id = $1`, [request.params.id]);
     if (!existing.rows[0]) return reply.code(404).send({ statusCode: 404, error: 'Not Found', message: 'Event not found.' });
