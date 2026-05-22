@@ -4,15 +4,28 @@ Zelfgehost foto- en video-deelplatform. Jij host alles op je eigen computer thui
 
 ## Installatie (Ubuntu / Debian server)
 
-Voer dit éne commando uit op je server:
+### Optie A — Als de repo publiek staat (one-liner)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/nightmaremood-coder/memories-hub/main/setup.sh | bash
 ```
 
+> De repo publiek maken: GitHub → Settings → Danger Zone → **Change visibility → Public**
+
+### Optie B — Als de repo privé blijft
+
+```bash
+git clone https://github.com/nightmaremood-coder/memories-hub.git
+cd memories-hub
+bash setup.sh
+```
+
+> Voor klonen van een privé-repo heb je een [Personal Access Token](https://github.com/settings/tokens) nodig als wachtwoord, of een SSH-sleutel.
+
+---
+
 Het script doet alles automatisch:
 - Controleert of Docker en Git aanwezig zijn
-- Kloont deze repository
 - Genereert veilige willekeurige wachtwoorden in een `.env` bestand
 - Bouwt de Docker images en start alle services
 - Toont het adres van de API en het admin paneel
