@@ -4,6 +4,8 @@ networks:
   internal_net:
     driver: bridge
     internal: true
+  admin_net:
+    driver: bridge
 
 volumes:
   postgres_data:
@@ -121,6 +123,7 @@ services:
     ports:
       - "8888:80"
     networks:
+      - admin_net
       - internal_net
     depends_on:
       - api
