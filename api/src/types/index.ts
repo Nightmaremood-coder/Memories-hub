@@ -86,8 +86,11 @@ export interface Media {
   updated_at: Date;
 }
 
-declare module 'fastify' {
-  interface FastifyRequest {
-    user?: Pick<User, 'id' | 'role' | 'status'>;
+// Tell @fastify/jwt what shape the decoded JWT payload has.
+// This makes request.user properly typed without conflicting with fastify's own declarations.
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    payload: { id: string; role: UserRole; status: UserStatus };
+    user: { id: string; role: UserRole; status: UserStatus };
   }
 }

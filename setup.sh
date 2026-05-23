@@ -26,6 +26,19 @@ command -v docker >/dev/null 2>&1 || error "Docker is niet geïnstalleerd. Insta
 docker compose version >/dev/null 2>&1 || error "Docker Compose (v2) is niet beschikbaar. Voer 'sudo apt install docker-compose-plugin' uit."
 command -v git >/dev/null 2>&1 || error "Git is niet geïnstalleerd. Voer 'sudo apt install git' uit."
 
+# Docker socket bereikbaarheidscheck (veelvoorkomend probleem op Ubuntu)
+if ! docker info >/dev/null 2>&1; then
+  echo ""
+  echo -e "${RED}[memories-hub]${NC} Geen toegang tot de Docker socket."
+  echo ""
+  echo "  Voer dit uit en start het script daarna opnieuw:"
+  echo ""
+  echo -e "  ${CYAN}sudo usermod -aG docker \$USER${NC}"
+  echo -e "  ${CYAN}newgrp docker${NC}"
+  echo ""
+  exit 1
+fi
+
 success "Alle vereisten aanwezig."
 
 # ── Repository klonen ──────────────────────────────────────────────────────────
@@ -72,14 +85,15 @@ info "Memories-Hub starten..."
 docker compose up -d
 
 # ── Wachten tot de API bereikbaar is ──────────────────────────────────────────
-info "Wachten tot de API gereed is..."
-MAX_WAIT=90
+info "Wachten tot de API gereed is (max 2 minuten)..."
+MAX_WAIT=120
 ELAPSED=0
-until curl -sf http://localhost:8080/health >/dev/null 2>&1; do
-  sleep 3
-  ELAPSED=$((ELAPSED + 3))
+until docker compose exec -T api wget -qO- http://localhost:3000/health >/dev/null 2>&1; do
+  sleep 4
+  ELAPSED=$((ELAPSED + 4))
   if [ $ELAPSED -ge $MAX_WAIT ]; then
-    warn "API is na ${MAX_WAIT}s nog niet bereikbaar. Controleer: docker compose logs api"
+    warn "API start langzaam op. Controleer de logs met: docker compose logs api"
+    warn "Dit is normaal bij de eerste keer — de database wordt nog opgezet."
     break
   fi
 done

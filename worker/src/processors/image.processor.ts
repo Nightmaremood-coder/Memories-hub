@@ -37,13 +37,14 @@ export async function processImage(
 
   if (RAW_EXTENSIONS.has(ext)) {
     tempTiff = join(renditionsDir, `_raw_temp.tiff`);
-    await execFileAsync('dcraw', ['-T', '-w', '-o', '1', '-4', '-q', '3', originalPath]);
+    // dcraw_emu is provided by the libraw Alpine package (replaces the unmaintained dcraw)
+    await execFileAsync('dcraw_emu', ['-T', '-w', '-o', '1', '-4', '-q', '3', originalPath]);
     const dcrawOutput = originalPath.replace(ext, '.tiff');
     if (existsSync(dcrawOutput)) {
       workPath = dcrawOutput;
       tempTiff = dcrawOutput;
     } else {
-      throw new Error(`dcraw did not produce a TIFF for ${originalPath}`);
+      throw new Error(`dcraw_emu did not produce a TIFF for ${originalPath}`);
     }
   }
 
